@@ -25,6 +25,7 @@ public:
 	void DFS(); // prints DFS traversal of the complete graph
 	void vectorListPrint();	//to print whether vertex is properly stored in the list or not
 	void edgeList();
+	void searchEdge(int x, bool bidirection);	//Search all the edges 
 };
 
 Graph::Graph(int V)
@@ -92,6 +93,25 @@ void Graph::edgeList()
 	}
 }
 
+void Graph::searchEdge(int x, bool flagBidirectionalEdges = true)
+{
+	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
+	{
+		if(i -> first == x)
+		{
+			cout << i -> first << " " << i -> second << endl;
+		}
+		else
+		{
+			if(flagBidirectionalEdges && i -> second == x)
+			{
+				cout << i -> first << " " << i -> second << endl;
+			}
+		}
+
+	}
+}
+
 int main()
 {
 	// Create a graph given in the above diagram
@@ -106,10 +126,19 @@ int main()
 	cout << "Following is Depth First Traversal\n";
 	
 	g.DFS();
+
 	cout << "List Printing in DFS order" << endl;
 	g.vectorListPrint();
+
 	cout << "Edge List Printing in DFS order" << endl;
 	g.edgeList();
+
+	cout << "Edge list with 1 as vertex input (Unidirectional)" << endl;
+	int x = 1;
+	g.searchEdge(x, false);	//second argument false - because this is unidirectional
+
+	cout << "Edge list with 1 as vertex input (bidirectional)" << endl;	
+	g.searchEdge(x);	// no argument - bidirectional
 
 	return 0;
 }
