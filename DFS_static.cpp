@@ -1,5 +1,7 @@
 #include <iostream>
 #include <list>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -8,16 +10,30 @@ class Graph
 	int V; // No. of vertices
 	list<int> *adj; // Pointer to an array containing adjacency lists
 	void DFSUtil(int v, bool visited[]); // A function used by DFS
+	
+	/* To maintain vertex list so that can be used for algorithm*/
+	vector<int> vertexList;
+	int vertexListCounter;
+
+	/* Edge List needed so that we can traverse	*/
+	vector<pair<int,int> > bidirectionalEdges;
+
+
 public:
 	Graph(int V); // Constructor
 	void addEdge(int v, int w); // function to add an edge to graph
 	void DFS(); // prints DFS traversal of the complete graph
+	void vectorListPrint();	//to print whether vertex is properly stored in the list or not
+	void edgeList();
 };
 
 Graph::Graph(int V)
 {
 	this->V = V;
 	adj = new list<int>[V];
+
+	/* creating a new vector to store the list of vertex in DFS order	*/
+	vertexListCounter = 0;	// this is to maintain the index of Vertex List Vector
 }
 
 void Graph::addEdge(int v, int w)
@@ -28,14 +44,21 @@ void Graph::addEdge(int v, int w)
 void Graph::DFSUtil(int v, bool visited[])
 {
 	// Mark the current node as visited and print it
+
+	vertexList.push_back(v);
 	visited[v] = true;
+
 	cout << v << " ";
 
 	// Recur for all the vertices adjacent to this vertex
 	list<int>::iterator i;
 	for(i = adj[v].begin(); i != adj[v].end(); ++i)
 		if(!visited[*i])
+		{
+			bidirectionalEdges.push_back(make_pair(v,*i));
+			bidirectionalEdges.push_back(make_pair(*i,v));
 			DFSUtil(*i, visited);
+		}
 }
 
 // The function to do DFS traversal. It uses recursive DFSUtil()
@@ -53,6 +76,22 @@ void Graph::DFS()
 			DFSUtil(i, visited);
 }
 
+void Graph::vectorListPrint()
+{
+	for (std::vector<int>::iterator i = vertexList.begin(); i != vertexList.end(); ++i)
+	{
+		cout << *i << endl;
+	}
+}
+
+void Graph::edgeList()
+{
+	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
+	{
+		cout << i -> first << " " << i -> second << endl;
+	}
+}
+
 int main()
 {
 	// Create a graph given in the above diagram
@@ -62,10 +101,15 @@ int main()
 	g.addEdge(1, 2);
 	g.addEdge(2, 0);
 	g.addEdge(2, 3);
-	g.addEdge(3, 3);
+	//g.addEdge(3, 3);
 
 	cout << "Following is Depth First Traversal\n";
+	
 	g.DFS();
+	cout << "List Printing in DFS order" << endl;
+	g.vectorListPrint();
+	cout << "Edge List Printing in DFS order" << endl;
+	g.edgeList();
 
 	return 0;
 }

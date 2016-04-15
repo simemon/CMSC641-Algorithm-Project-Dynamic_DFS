@@ -20,7 +20,12 @@ TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
 
 /* Driver code: Main Program */
 
-
+int main
+{
+	TreeNode* root = ()
+	lowestCommonAncestor()
+	return 0;
+}
 
 /*
 Path
