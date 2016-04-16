@@ -3,46 +3,47 @@
 #include <vector>
 #include <algorithm>
 
+typedef int graphtype;
 using namespace std;
 
 class Graph
 {
-	int V; // No. of vertices
-	list<int> *adj; // Pointer to an array containing adjacency lists
-	void DFSUtil(int v, bool visited[]); // A function used by DFS
+	int V; 				  // No. of vertices
+	list<graphtype> *adj; // Pointer to an array containing adjacency lists
+	void DFSUtil(graphtype v, bool visited[]); // A function used by DFS
 	
 	/* To maintain vertex list so that can be used for algorithm*/
-	vector<int> vertexList;
+	vector<graphtype> vertexList;
 	int vertexListCounter;
 
 	/* Edge List needed so that we can traverse	*/
-	vector<pair<int,int> > bidirectionalEdges;
+	vector<pair<graphtype,graphtype> > bidirectionalEdges;
 
 
 public:
 	Graph(int V); // Constructor
-	void addEdge(int v, int w); // function to add an edge to graph
+	void addEdge(graphtype v, graphtype w); // function to add an edge to graph
 	void DFS(); // prints DFS traversal of the complete graph
 	void vectorListPrint();	//to print whether vertex is properly stored in the list or not
 	void edgeList();
-	void searchEdge(int x, bool bidirection);	//Search all the edges 
+	void searchEdge(graphtype x, bool bidirection);	//Search all the edges 
 };
 
 Graph::Graph(int V)
 {
 	this->V = V;
-	adj = new list<int>[V];
+	adj = new list<graphtype>[V];
 
 	/* creating a new vector to store the list of vertex in DFS order	*/
 	vertexListCounter = 0;	// this is to maintain the index of Vertex List Vector
 }
 
-void Graph::addEdge(int v, int w)
+void Graph::addEdge(graphtype v, graphtype w)
 {
 	adj[v].push_back(w); // Add w to v’s list.
 }
 
-void Graph::DFSUtil(int v, bool visited[])
+void Graph::DFSUtil(graphtype v, bool visited[])
 {
 	// Mark the current node as visited and print it
 
@@ -52,7 +53,7 @@ void Graph::DFSUtil(int v, bool visited[])
 	cout << v << " ";
 
 	// Recur for all the vertices adjacent to this vertex
-	list<int>::iterator i;
+	list<graphtype>::iterator i;
 	for(i = adj[v].begin(); i != adj[v].end(); ++i)
 		if(!visited[*i])
 		{
@@ -70,6 +71,7 @@ void Graph::DFS()
 	for (int i = 0; i < V; i++)
 		visited[i] = false;
 
+	cout << "Before calling DFSUtil" << endl;
 	// Call the recursive helper function to print DFS traversal
 	// starting from all vertices one by one
 	for (int i = 0; i < V; i++)
@@ -79,7 +81,7 @@ void Graph::DFS()
 
 void Graph::vectorListPrint()
 {
-	for (std::vector<int>::iterator i = vertexList.begin(); i != vertexList.end(); ++i)
+	for (std::vector<graphtype>::iterator i = vertexList.begin(); i != vertexList.end(); ++i)
 	{
 		cout << *i << endl;
 	}
@@ -87,15 +89,15 @@ void Graph::vectorListPrint()
 
 void Graph::edgeList()
 {
-	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
+	for (vector< pair <graphtype,graphtype> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
 	{
 		cout << i -> first << " " << i -> second << endl;
 	}
 }
 
-void Graph::searchEdge(int x, bool flagBidirectionalEdges = true)
+void Graph::searchEdge(graphtype x, bool flagBidirectionalEdges = true)
 {
-	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
+	for (vector< pair <graphtype,graphtype> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
 	{
 		if(i -> first == x)
 		{
@@ -115,16 +117,49 @@ void Graph::searchEdge(int x, bool flagBidirectionalEdges = true)
 int main()
 {
 	// Create a graph given in the above diagram
-	Graph g(4);
+	Graph g(8);
+	
+	/*
 	g.addEdge(0, 1);
 	g.addEdge(0, 2);
 	g.addEdge(1, 2);
 	g.addEdge(2, 0);
 	g.addEdge(2, 3);
-	//g.addEdge(3, 3);
+	*/
+
+	/*
+	g.addEdge('x', 'z');
+	g.addEdge('x', 'u');
+	g.addEdge('z', 'y');
+	g.addEdge('z', 'w');
+	g.addEdge('u', 'v');
+	g.addEdge('w', 's');
+	g.addEdge('w', 't');
+	*/
+
+	/*
+	x = 0
+	z = 1
+	u = 2
+	w = 3
+	y = 4
+	v = 5
+	s = 6
+	t = 7
+	*/
+	g.addEdge(0, 1);
+	g.addEdge(0, 2);
+	g.addEdge(1, 3);
+	g.addEdge(1, 4);
+	g.addEdge(2, 5);
+	g.addEdge(3, 6);
+	g.addEdge(3, 7);
+
+	g.addEdge(0,6);
+	g.addEdge(1,7);
+
 
 	cout << "Following is Depth First Traversal\n";
-	
 	g.DFS();
 
 	cout << "List Printing in DFS order" << endl;
@@ -134,7 +169,7 @@ int main()
 	g.edgeList();
 
 	cout << "Edge list with 1 as vertex input (Unidirectional)" << endl;
-	int x = 1;
+	graphtype x = 0;
 	g.searchEdge(x, false);	//second argument false - because this is unidirectional
 
 	cout << "Edge list with 1 as vertex input (bidirectional)" << endl;	
