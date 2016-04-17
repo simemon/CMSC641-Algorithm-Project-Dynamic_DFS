@@ -267,20 +267,30 @@ void BinarySearchTree::insert(BSTNode *node, std::vector<int>& vertexList)
 	pos_node = distance(vertexList.begin(),iterator_node);
 	cout << "pos_node" << pos_node << endl;
 
+	std::vector<int>::iterator iterator_low, iterator_high;
+	iterator_low = vertexList.begin();
+	iterator_high = vertexList.end();
+
 	while (p != NULL)
 	{
 		prev = p;
-		std::vector<int>::iterator iterator_p = find(vertexList.begin(), vertexList.end(), p->m_vertex.first);
-		pos_p = distance(vertexList.begin(),iterator_p); 
+		std::vector<int>::iterator iterator_p = find(iterator_low, iterator_high, p->m_vertex.first);
+		pos_p = distance(vertexList.begin(),iterator_p);
 		cout<< "pos_p" << " " <<pos_p << endl;
 		//if(node->m_vertex.second != p->m_vertex.second)
 		//	p = p->m_right;
 		//assuming any vertices share only one edges
 		
 		if (pos_node < pos_p)
+		{
 			p = p->m_left;
+			iterator_high = iterator_p - 1;
+		}
 		else
+		{
 			p = p->m_right;
+			iterator_low = iterator_p + 1;
+		}
 	}
 
 	if(root == NULL)
