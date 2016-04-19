@@ -2,7 +2,6 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-
 #include <unistd.h>
 
 using namespace std;
@@ -202,10 +201,6 @@ class BSTNode
 			 	return NULL;
 			 return new_root;
 		}
-
-
-
-
 };	
 
 class BinarySearchTree
@@ -214,8 +209,7 @@ class BinarySearchTree
 
 		BSTNode *root;
 		void inorder(BSTNode*);
-		void traverse(BSTNode*);
-
+		
 		virtual void visit(BSTNode *node)
 		{
 			cout << node->m_vertex.first << " " << node->m_vertex.second << endl;
@@ -242,7 +236,7 @@ class BinarySearchTree
 
 		void insert(BSTNode*);
 		void buildBST(int);
-		void buildBST(BinarySearchTree*);
+		
 		void inorderWithVector(BSTNode*, vector<BSTNode*>&);
 		vector<BSTNode*> inorderforList()
 		{
@@ -251,12 +245,7 @@ class BinarySearchTree
 			inorderWithVector(root, v);
 			return v;
 		}
-
-
 };
-
-
-
 
 BinarySearchTree*  BinarySearchTree::copyTree()
 {
@@ -281,14 +270,6 @@ void BinarySearchTree::insert(BSTNode *node)
 	cout << "Node : " << node->m_vertex.first << "-" << node->m_vertex.second << endl;
 	
 	BSTNode *p = root, *prev = NULL;
-	// if(existingRoot==NULL)
-	// 	 p = root;
-	// else
-	// 	p = existingRoot;
-
-	/*cout << "Before inorder in insert" << endl;
-	inorder();
-	cout << "After inorder in insert" << endl;*/
 
 	size_t pos_node, pos_p;
 	std::vector<int>::iterator iterator_node = find(g.vertexList.begin(), g.vertexList.end(), node->m_vertex.first);
@@ -324,41 +305,18 @@ void BinarySearchTree::insert(BSTNode *node)
 
 void BinarySearchTree::buildBST(int x) //should take argument vertex v
 { 
-	
 	cout << "In build BST for leaf node through assignLeaf" << endl;
-	
 	std::vector< pair<int,int> > vel;
 	vel = g.searchEdge(x);
-	
 	for(std::vector< pair<int,int> >::iterator ite = vel.begin(); ite != vel.end(); ++ite)
 	{
 		BSTNode *node = new BSTNode(make_pair(ite->first,ite->second));
 		insert(node);
-		
-	}
-	
-}
-
-void BinarySearchTree::buildBST(BinarySearchTree *rightBST)
-{
-	if(rightBST != NULL)
-	{
-		BSTNode *rp = rightBST->root;
-		
-		//BSTNode *lp = leftBST->root;
-		//inorder(rp);
-		//inorder(rp->m_left);
-		//insert(g->vertexList,inorder(rp),lp);
-		
-		cout<<"In intermediate buildBST" << endl;
-		traverse(rp);
-		//inorder(rp->m_right);
 	}
 }
 
 void BinarySearchTree::inorder(BSTNode *node)
 {
-
 	if(node!=NULL)
 	{
 		inorder(node->m_left);
@@ -370,41 +328,13 @@ void BinarySearchTree::inorder(BSTNode *node)
 
 void BinarySearchTree::inorderWithVector(BSTNode* node, vector<BSTNode*> &v)
 {
-
 	if(node!=NULL)
 	{
 		inorderWithVector(node->m_left, v);
-		/*sleep(1);
-		cout << node->m_vertex.first << " " << node->m_vertex.second<< endl;*/
 		v.push_back(node);
 		inorderWithVector(node->m_right, v);
 	}
 }
-
-
-/*BSTNode* BinarySearchTree::inorder(BSTNode *rNode)
-{
-	if(rNode!=NULL)
-	{
-		inorder(rNode->m_left);
-		
-		inorder(rNode->m_right);
-	}
-}
-*/
-
-void BinarySearchTree::traverse(BSTNode *rNode)
-{
-	if(rNode != NULL)
-	{
-		traverse(rNode -> m_left);
-		cout<<"Before insert : " << rNode->m_vertex.first << "-" << rNode->m_vertex.second << endl;
-		insert(rNode);
-		traverse(rNode->m_right);
-	}
-}
-
-
 
 class BinarySearchTree;
 
@@ -412,7 +342,6 @@ struct SegmentTreeNode
 {
 
 	std::vector<int> segVertex;
-
 	std::vector<pair<int,int> > eList;
 
 	BinarySearchTree *ptrBST;
@@ -432,37 +361,21 @@ struct SegmentTreeNode
   void merge(SegmentTreeNode& left, SegmentTreeNode& right) {
 
   	cout << "In Merge Function: " << endl;
-  	/*cout << "left.segVertex.size(): " << left.segVertex.size() << endl;
-  	cout << "right.segVertex.size(): " << right.segVertex.size() << endl;*/
 
   	segVertex.reserve( left.segVertex.size() + right.segVertex.size() );
   	segVertex.insert(segVertex.end(), left.segVertex.begin(), left.segVertex.end());
   	segVertex.insert(segVertex.end(), right.segVertex.begin(), right.segVertex.end());
   	
-  	/*cout << "Printing segVertex" << endl;
-  	for (std::vector<int>::iterator i = segVertex.begin(); i != segVertex.end(); ++i)
-  	{
-  		cout << *i << endl;
-  	}
-
-  	cout << "End of segVertex" << endl;*/
-
 	BinarySearchTree *leftBST = left.ptrBST, *rightBST = right.ptrBST;
 
   	if(leftBST != NULL && rightBST != NULL)
   	{
 
   		ptrBST = leftBST -> copyTree();
-
- 		cout << "Right Inorder: " << endl;
-
-  		rightBST -> inorder();
-
   		vector<BSTNode*> v = rightBST -> inorderforList();
 
   		for (vector<BSTNode*>::iterator i = v.begin(); i != v.end(); ++i)
   		{
-/*  			cout << "Node print before insert in Merge " << (*i)->m_vertex.first << "-" << (*i)->m_vertex.second << endl;*/
   			ptrBST -> insert(*i);
   		}
 
@@ -476,16 +389,15 @@ struct SegmentTreeNode
 
 };
 
-class SegmentTree {
+class SegmentTree 
+{
   SegmentTreeNode* nodes;
-  //Graph g;
   int N;
 
 public:
-  SegmentTree() { //N should be the vertex count
-    //g = new Graph(g);
+  SegmentTree() 	//N should be the vertex count
+  { 
     N = g.vertexList.size();
-    /*cout << "Value of N:  " << N << endl;*/
     nodes = new SegmentTreeNode[getSegmentTreeSize(N)];
     buildTree(1, 0, N-1);
     
@@ -499,9 +411,9 @@ public:
   void buildTree(int stIndex, int lo, int hi) 
   {
 
-  	if (lo == hi) {
-  	  /*cout << "Testing vertexList: " << g.vertexList[lo] << endl; */
-      nodes[stIndex].assignLeaf(g.vertexList[lo]);
+  	if (lo == hi) 
+  	{
+  	  nodes[stIndex].assignLeaf(g.vertexList[lo]);
       return;
     }
     
@@ -511,13 +423,11 @@ public:
 
     buildTree(left, lo, mid);
     buildTree(right, mid + 1, hi);
-    /*cout << "Argument Passed to merge from buildTree- ";
-    cout << "1st one: " << nodes[left].ptrBST -> m_vertex.first "-" << nodes[left].ptrBST -> m.vertex.second;
-    cout << ", 2nd one: " <<  nodes[right].ptrBST -> m_vertex.first "-" << nodes[right].ptrBST -> m.vertex.second << endl;*/
     nodes[stIndex].merge(nodes[left], nodes[right]);
   }
   
-  int getSegmentTreeSize(int N) {
+  int getSegmentTreeSize(int N) 
+  {
     int size = 1;
     for (; size < N; size <<= 1);
     return size << 1;
@@ -529,27 +439,11 @@ public:
 int main()
 {
 
-
-	//g = new Graph(8);
-
-	// g.addEdge(0, 1);
-	// g.addEdge(0, 2);
-	// g.addEdge(1, 2);
-	// g.addEdge(2, 0);
-	// g.addEdge(2, 3);
-	//g.addEdge(3, 3);
-
 	g.addEdge(0, 1);
 	g.addEdge(0, 2);
 	g.addEdge(1, 3);
 	g.addEdge(1, 4);
-	// g->addEdge(2, 5);
-	// g->addEdge(3, 6);
-	// g->addEdge(3, 7);
-
-	// g->addEdge(0,6);
-	// g->addEdge(1,7);
-
+	
 	cout << "Following is Depth First Traversal" <<endl;
 	
 	g.DFS();
