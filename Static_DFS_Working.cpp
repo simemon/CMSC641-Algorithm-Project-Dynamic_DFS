@@ -106,7 +106,7 @@ void Graph::edgeList()
 
 std::vector< pair<int,int> > Graph::searchEdge(int x, bool flagBidirectionalEdges = true)
 {
-	cout<<"In search edge"<< x << endl;
+	cout<<"In search edge: "<< x << endl;
 	std::vector< pair<int,int> > vEdgeList;
 
 	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
@@ -139,10 +139,15 @@ class BSTNode
 {
 	friend class BinarySearchTree;
  	protected:
-		pair<int,int> m_vertex;
+		
 		BSTNode *m_left, *m_right;
 
 	public:
+		pair<int,int> m_vertex;
+		BSTNode()
+		{
+
+		}
 		BSTNode(pair<int,int> vertex) : m_vertex(vertex), m_left(NULL), m_right(NULL) { }
 		~BSTNode();
 
@@ -175,13 +180,39 @@ class BSTNode
 		{
 			return m_right;
 		}
+
+		BSTNode* copy()
+		{
+			return copy(this);
+		}
+
+		BSTNode* copy(BSTNode* root) 
+		{
+     
+			BSTNode *new_root;
+			 
+			 if(root != NULL)
+			 {
+			     new_root = new BSTNode;
+			     new_root -> m_vertex = root -> m_vertex;
+			     new_root -> m_left = copy(root -> m_left);
+			     new_root -> m_right = copy(root -> m_right);
+			 } 
+			 else 
+			 	return NULL;
+			 return new_root;
+		}
+
+
+
+
 };	
 
 class BinarySearchTree
 {
 	protected:
-		BSTNode *root;
 
+		BSTNode *root;
 		void inorder(BSTNode*);
 		void traverse(BSTNode*);
 
@@ -191,7 +222,9 @@ class BinarySearchTree
 		}
 
 	public:
-		BinarySearchTree() : root(NULL) { }
+		BinarySearchTree* copyTree();
+		BinarySearchTree(BSTNode* r = NULL) : root(r) { }
+		
 		~BinarySearchTree()
 		{
 			//clear();
@@ -210,23 +243,52 @@ class BinarySearchTree
 		void insert(BSTNode*);
 		void buildBST(int);
 		void buildBST(BinarySearchTree*);
+		void inorderWithVector(BSTNode*, vector<BSTNode*>&);
+		vector<BSTNode*> inorderforList()
+		{
+			vector<BSTNode*> v;
+			cout << "Going inside inorderWithVector" << endl;
+			inorderWithVector(root, v);
+			return v;
+		}
+
+
 };
 
 
 
 
+BinarySearchTree*  BinarySearchTree::copyTree()
+{
+	BSTNode* new_root = root -> copy();	
+	BinarySearchTree* new_tree = new BinarySearchTree(new_root);
+	return new_tree;
+}
+
+
 void BinarySearchTree::insert(BSTNode *node) 
 {
-	cout<<"Node : " << node->m_vertex.first << "-" << node->m_vertex.second << " ";
+
+	node -> m_left = node -> m_right = NULL;
+
+	if(root == NULL)
+	{
+		root = node;
+		cout << "Assigned to root: " << node->m_vertex.first << "-" << node->m_vertex.second << endl;
+		return;
+	}
+	
+	cout << "Node : " << node->m_vertex.first << "-" << node->m_vertex.second << endl;
+	
 	BSTNode *p = root, *prev = NULL;
 	// if(existingRoot==NULL)
 	// 	 p = root;
 	// else
 	// 	p = existingRoot;
 
-	cout << "Before inorder in insert" << endl;
+	/*cout << "Before inorder in insert" << endl;
 	inorder();
-	cout << "After inorder in insert" << endl;
+	cout << "After inorder in insert" << endl;*/
 
 	size_t pos_node, pos_p;
 	std::vector<int>::iterator iterator_node = find(g.vertexList.begin(), g.vertexList.end(), node->m_vertex.first);
@@ -239,7 +301,7 @@ void BinarySearchTree::insert(BSTNode *node)
 	while (p != NULL)
 	{
 		prev = p;
-		std::vector<int>::iterator iterator_p = find(iterator_low, iterator_high, p->m_vertex.first);
+		vector<int>::iterator iterator_p = find(iterator_low, iterator_high, p->m_vertex.first);
 		pos_p = distance(g.vertexList.begin(),iterator_p);
 		
 		if (pos_node < pos_p)
@@ -254,18 +316,16 @@ void BinarySearchTree::insert(BSTNode *node)
 		}
 	}
 
-	if(root == NULL)
-		root = node;
-	else if (pos_node < pos_p)
-		prev->m_left = node;
+	if (pos_node < pos_p)
+		prev -> m_left = node;
 	else
-		prev->m_right = node;
+		prev -> m_right = node;
 }
 
 void BinarySearchTree::buildBST(int x) //should take argument vertex v
 { 
 	
-	cout<<"In buildBST" << endl;
+	cout << "In build BST for leaf node through assignLeaf" << endl;
 	
 	std::vector< pair<int,int> > vel;
 	vel = g.searchEdge(x);
@@ -281,13 +341,15 @@ void BinarySearchTree::buildBST(int x) //should take argument vertex v
 
 void BinarySearchTree::buildBST(BinarySearchTree *rightBST)
 {
-	if(rightBST!=NULL)
+	if(rightBST != NULL)
 	{
 		BSTNode *rp = rightBST->root;
+		
 		//BSTNode *lp = leftBST->root;
 		//inorder(rp);
 		//inorder(rp->m_left);
 		//insert(g->vertexList,inorder(rp),lp);
+		
 		cout<<"In intermediate buildBST" << endl;
 		traverse(rp);
 		//inorder(rp->m_right);
@@ -296,6 +358,7 @@ void BinarySearchTree::buildBST(BinarySearchTree *rightBST)
 
 void BinarySearchTree::inorder(BSTNode *node)
 {
+
 	if(node!=NULL)
 	{
 		inorder(node->m_left);
@@ -304,6 +367,20 @@ void BinarySearchTree::inorder(BSTNode *node)
 		inorder(node->m_right);
 	}
 }
+
+void BinarySearchTree::inorderWithVector(BSTNode* node, vector<BSTNode*> &v)
+{
+
+	if(node!=NULL)
+	{
+		inorderWithVector(node->m_left, v);
+		/*sleep(1);
+		cout << node->m_vertex.first << " " << node->m_vertex.second<< endl;*/
+		v.push_back(node);
+		inorderWithVector(node->m_right, v);
+	}
+}
+
 
 /*BSTNode* BinarySearchTree::inorder(BSTNode *rNode)
 {
@@ -318,49 +395,80 @@ void BinarySearchTree::inorder(BSTNode *node)
 
 void BinarySearchTree::traverse(BSTNode *rNode)
 {
-	if(rNode!=NULL)
+	if(rNode != NULL)
 	{
-		traverse(rNode->m_left);
-		cout<<"Before insert : " << rNode->m_vertex.first << "-" << rNode->m_vertex.second << " ";
+		traverse(rNode -> m_left);
+		cout<<"Before insert : " << rNode->m_vertex.first << "-" << rNode->m_vertex.second << endl;
 		insert(rNode);
 		traverse(rNode->m_right);
 	}
 }
 
 
+
 class BinarySearchTree;
-struct SegmentTreeNode {
+
+struct SegmentTreeNode 
+{
 
 	std::vector<int> segVertex;
+
 	std::vector<pair<int,int> > eList;
+
 	BinarySearchTree *ptrBST;
   
-  void assignLeaf(int value) {
+  void assignLeaf(int value) 
+  {
+  	
   	ptrBST = new BinarySearchTree();
-  	ptrBST->buildBST(value);
-  	cout<<"Inorder of BST at " << value <<endl; 
+  	ptrBST -> buildBST(value);
+
+  	cout<<"Inorder of BST at " << value << endl; 
+  	
   	ptrBST->inorder();
     segVertex.push_back(value);
   }
   
   void merge(SegmentTreeNode& left, SegmentTreeNode& right) {
 
-  	segVertex.reserve( left.segVertex.size() + right.segVertex.size() );
+  	cout << "In Merge Function: " << endl;
+  	/*cout << "left.segVertex.size(): " << left.segVertex.size() << endl;
+  	cout << "right.segVertex.size(): " << right.segVertex.size() << endl;*/
 
+  	segVertex.reserve( left.segVertex.size() + right.segVertex.size() );
   	segVertex.insert(segVertex.end(), left.segVertex.begin(), left.segVertex.end());
   	segVertex.insert(segVertex.end(), right.segVertex.begin(), right.segVertex.end());
-  	//segVertex.push_back(111);
-
-	BinarySearchTree *leftBST=left.ptrBST, *rightBST=right.ptrBST;
-
-  	if(leftBST != NULL && rightBST!=NULL)
+  	
+  	/*cout << "Printing segVertex" << endl;
+  	for (std::vector<int>::iterator i = segVertex.begin(); i != segVertex.end(); ++i)
   	{
-  		ptrBST = new BinarySearchTree();
-  		ptrBST = leftBST;
+  		cout << *i << endl;
+  	}
 
-  		ptrBST->buildBST(rightBST);
-  		cout<<"Inorder of intermediate BST" <<endl;
-  		ptrBST->inorder();
+  	cout << "End of segVertex" << endl;*/
+
+	BinarySearchTree *leftBST = left.ptrBST, *rightBST = right.ptrBST;
+
+  	if(leftBST != NULL && rightBST != NULL)
+  	{
+
+  		ptrBST = leftBST -> copyTree();
+
+ 		cout << "Right Inorder: " << endl;
+
+  		rightBST -> inorder();
+
+  		vector<BSTNode*> v = rightBST -> inorderforList();
+
+  		for (vector<BSTNode*>::iterator i = v.begin(); i != v.end(); ++i)
+  		{
+/*  			cout << "Node print before insert in Merge " << (*i)->m_vertex.first << "-" << (*i)->m_vertex.second << endl;*/
+  			ptrBST -> insert(*i);
+  		}
+
+  		cout << "Before ptrBST -> inorder()" << endl; 
+  		ptrBST -> inorder();
+  		cout << "After ptrBST -> inorder()" << endl; 
   	}
 
 
@@ -377,8 +485,9 @@ public:
   SegmentTree() { //N should be the vertex count
     //g = new Graph(g);
     N = g.vertexList.size();
+    /*cout << "Value of N:  " << N << endl;*/
     nodes = new SegmentTreeNode[getSegmentTreeSize(N)];
-    buildTree(g.vertexList, 1, 0, N-1);
+    buildTree(1, 0, N-1);
     
   }
   
@@ -387,15 +496,24 @@ public:
   }
   
   private:	
-  void buildTree(std::vector<int>& value, int stIndex, int lo, int hi) {
-    if (lo == hi) {
-      nodes[stIndex].assignLeaf(value[lo]);
+  void buildTree(int stIndex, int lo, int hi) 
+  {
+
+  	if (lo == hi) {
+  	  /*cout << "Testing vertexList: " << g.vertexList[lo] << endl; */
+      nodes[stIndex].assignLeaf(g.vertexList[lo]);
       return;
     }
     
-    int left = 2 * stIndex, right = left + 1, mid = (lo + hi) / 2;
-    buildTree(value, left, lo, mid);
-    buildTree(value, right, mid + 1, hi);
+    int left = 2 * stIndex;
+    int right = left + 1;
+    int mid = (lo + hi) / 2;
+
+    buildTree(left, lo, mid);
+    buildTree(right, mid + 1, hi);
+    /*cout << "Argument Passed to merge from buildTree- ";
+    cout << "1st one: " << nodes[left].ptrBST -> m_vertex.first "-" << nodes[left].ptrBST -> m.vertex.second;
+    cout << ", 2nd one: " <<  nodes[right].ptrBST -> m_vertex.first "-" << nodes[right].ptrBST -> m.vertex.second << endl;*/
     nodes[stIndex].merge(nodes[left], nodes[right]);
   }
   
