@@ -73,6 +73,8 @@ Graph::Graph(int V)
 void Graph::addEdge(int v, int w)
 {
 	adj[v].push_back(w); // Add w to v’s list.
+	bidirectionalEdges.push_back(make_pair(v, w));
+	bidirectionalEdges.push_back(make_pair(w, v));
 }
 
 void Graph::DFSUtil(int v, bool visited[])
@@ -88,8 +90,8 @@ void Graph::DFSUtil(int v, bool visited[])
 	for(i = adj[v].begin(); i != adj[v].end(); ++i)
 		if(!visited[*i])
 		{
-			bidirectionalEdges.push_back(make_pair(v,*i));
-			bidirectionalEdges.push_back(make_pair(*i,v));
+			/*bidirectionalEdges.push_back(make_pair(v,*i));
+			bidirectionalEdges.push_back(make_pair(*i,v));*/
 			
 			DFSEdges.push_back(make_pair(v,*i));
 
@@ -495,7 +497,34 @@ public:
    
 };
 
+pair <int, int> Query(vector<BSTNode*> &BSTNodeVector, int w, int x, int y)
+{
+	clock_t begin = clock();
+	
+	vector<int> pathList = g.Path(x,y);	
+	std::vector<int> childVector = g.findChildren(w);	//w
+  	int a = INT_MAX, b = INT_MAX;
+	pair<int, int > final_edge = make_pair(INT_MAX,INT_MAX);
+	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
+	{
+		/*cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;*/
+		if(find(pathList.begin(),pathList.end(), (*i)-> m_vertex.first) != pathList.end() && find(childVector.begin(),childVector.end(), (*i) -> m_vertex.second) != childVector.end())
+		{
+			cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
+			if(final_edge.first > (*i) -> m_vertex.first)
+			{
+				final_edge.first = (*i) -> m_vertex.first;
+				final_edge.second = (*i) -> m_vertex.second;		
+			}
+		}
+	}
 
+	clock_t end = clock();
+  	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+  	cout << "elapsed_secs: " << elapsed_secs << endl;
+
+	return final_edge;
+}
 
 
 int main()
@@ -598,18 +627,14 @@ int main()
 		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;  		
   	}
 
-
   	cout << "DFS Edge List" << endl;
-
-  	g.DFSEdgeList();
-
-  	cout << "Path List" << endl;
+ 	g.DFSEdgeList();
+ 	cout << "Path List" << endl;
  	vector<int> pathList = g.Path(0,5);
   	for (vector<int>::iterator i = pathList.begin(); i != pathList.end(); ++i)
   	{
   		cout << *i << endl;
   	}
-
   	cout << "Children List" << endl;
   	std::vector<int> childVector = g.findChildren(2);	//w
   	for (vector<int>::iterator i = childVector.begin(); i != childVector.end(); ++i)
@@ -617,21 +642,9 @@ int main()
   		cout << *i << endl;
   	}
 
-  	int a = INT_MAX, b = INT_MAX;
-  	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
-	{
-		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
-		if(find(pathList.begin(),pathList.end(), (*i)-> m_vertex.first) != pathList.end() && find(childVector.begin(),childVector.end(), (*i) -> m_vertex.second) != childVector.end())
-		{
-			cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
-			if(a > (*i) -> m_vertex.first)
-			{
-				a = (*i) -> m_vertex.first;
-				b = (*i) -> m_vertex.second;		
-			}
-		}
-	}
-	cout << "Edge: " << a << b << endl;
+ 	pair<int,int> final_edge = Query(BSTNodeVector,2,0,5);
+  	
+	cout << "Edge: " << final_edge.first  << " " << final_edge.second << endl;
 
 	return 0;
 }
