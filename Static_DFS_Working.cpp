@@ -5,16 +5,21 @@
 #include <algorithm>
 #include <unistd.h>
 #include <set>
+#include <climits>
 
 
-#define VERTEX 1000
+/*#define VERTEX 1000
 #define EDGES 2500
+*/
 
+#define VERTEX 8
+#define EDGES 9
 
 using namespace std;
 
 #ifndef G_H
 #define G_H
+
 
 class SegmentTree;
 class BinarySearchTree;
@@ -32,7 +37,9 @@ class Graph
 	/* Edge List needed so that we can traverse	*/
 	vector< pair<int,int> > bidirectionalEdges;
 
+
 public:
+	vector< pair<int,int> > DFSEdges;
 	Graph() { }
 	Graph(int V); // Constructor
 	void addEdge(int v, int w); // function to add an edge to graph
@@ -40,7 +47,19 @@ public:
 	void vectorListPrint();	//to print whether vertex is properly stored in the list or not
 	void edgeList();
 	vector< pair<int,int> > searchEdge(int x, bool bidirection);	//Search all the edges 
+	void DFSEdgeList();
+	void PathUtil(int a, int b, vector<int> &v);
+	vector<int> findChildren(int w);
+	vector<int> Path(int a, int b)
+	{
+		vector<int> pathvector;
+		PathUtil(a,b,pathvector);
+		pathvector.push_back(a);
+		reverse(pathvector.begin(), pathvector.end());
+		return pathvector;
+	}
 };
+
 
 
 Graph::Graph(int V)
@@ -71,6 +90,9 @@ void Graph::DFSUtil(int v, bool visited[])
 		{
 			bidirectionalEdges.push_back(make_pair(v,*i));
 			bidirectionalEdges.push_back(make_pair(*i,v));
+			
+			DFSEdges.push_back(make_pair(v,*i));
+
 			DFSUtil(*i, visited);
 		}
 }
@@ -95,6 +117,14 @@ void Graph::vectorListPrint()
 	for (std::vector<int>::iterator i = vertexList.begin(); i != vertexList.end(); ++i)
 	{
 		cout << *i << endl;
+	}
+}
+
+void Graph::DFSEdgeList()
+{
+	for (vector< pair <int,int> >::iterator i = DFSEdges.begin(); i != DFSEdges.end(); ++i)
+	{
+		cout << i -> first << " " << i -> second << endl;
 	}
 }
 
@@ -133,16 +163,46 @@ std::vector< pair<int,int> > Graph::searchEdge(int x, bool flagBidirectionalEdge
 	return vEdgeList;
 }
 
+void Graph::PathUtil(int a, int b, vector<int> &pathvector)
+{
+	if(a == b)
+		return;
+	for (vector<pair <int, int> >::reverse_iterator i = DFSEdges.rbegin(); i != DFSEdges.rend(); ++i)
+	{
+		if(i -> first == a  && i -> second <= b)	
+		{
+			PathUtil(i -> second, b, pathvector);
+			pathvector.push_back(i -> second);
+			break;
+		}
+	}
+}
+
+vector<int> Graph::findChildren(int w)
+{
+	std::vector<int> childVector;
+	childVector.push_back(w);
+	for (vector<pair <int,int> >::iterator i = DFSEdges.begin(); i != DFSEdges.end(); ++i)
+	{
+		if(i -> first == w && i -> second > w)
+		{
+			childVector.push_back(i -> second);
+		}
+	}	
+	return childVector;
+}
+
+
 Graph g(VERTEX);
 
 class BinarySearchTree;
 class BSTNode
 {
+	
 	friend class BinarySearchTree;
- 	protected:
-		
-		BSTNode *m_left, *m_right;
 
+ 	protected:
+		BSTNode *m_left, *m_right;
 	public:
 		pair<int,int> m_vertex;
 		BSTNode()
@@ -207,7 +267,7 @@ class BSTNode
 class BinarySearchTree
 {
 	protected:
-		BSTNode *root;
+		
 		void inorder(BSTNode*);
 		
 		virtual void visit(BSTNode *node)
@@ -215,6 +275,7 @@ class BinarySearchTree
 			cout << node->m_vertex.first << " " << node->m_vertex.second << endl;
 		}
 	public:
+		BSTNode *root;
 		BinarySearchTree* copyTree();
 		BinarySearchTree(BSTNode* r = NULL) : root(r) { }
 		
@@ -314,7 +375,7 @@ void BinarySearchTree::buildBST(int x) //should take argument vertex v
 
 void BinarySearchTree::inorder(BSTNode *node)
 {
-	if(node!=NULL)
+	if(node != NULL)
 	{
 		inorder(node->m_left);
 		cout << node->m_vertex.first << " " << node->m_vertex.second<< endl;
@@ -324,7 +385,7 @@ void BinarySearchTree::inorder(BSTNode *node)
 
 void BinarySearchTree::inorderWithVector(BSTNode* node, vector<BSTNode*> &v)
 {
-	if(node!=NULL)
+	if(node != NULL)
 	{
 		inorderWithVector(node->m_left, v);
 		v.push_back(node);
@@ -339,7 +400,12 @@ struct SegmentTreeNode
   vector<int> segVertex;
   vector<pair<int,int> > eList;
   BinarySearchTree *ptrBST;
-  
+ 
+  BinarySearchTree* getBinarySearchTree()
+  {
+  	return ptrBST;
+  }
+
   void assignLeaf(int value) 
   {
   	
@@ -392,6 +458,11 @@ public:
     
   }
   
+  SegmentTreeNode* getNodes()
+  {
+  	return nodes;
+  }  
+
   ~SegmentTree() {
     delete[] nodes;
   }
@@ -425,10 +496,12 @@ public:
 };
 
 
+
+
 int main()
 {
 
-	srand (time(NULL));
+	/*srand (time(NULL));
 	set < pair<int,int> > s;
 	int v1, v2;
 
@@ -456,24 +529,49 @@ int main()
 	{
 		pair<int,int> p1 = *i;
 		g.addEdge(p1.first, p1.second);
-	}	
+	}*/	
 
-	/*g.addEdge(0, 3);
-	g.addEdge(0, 6);
-	g.addEdge(5, 10);
-	g.addEdge(6, 7);
-	g.addEdge(7, 8);
-	g.addEdge(7, 9);
-	g.addEdge(8, 10);
-	g.addEdge(10, 9);
+	// These are 16 edges and 11 vertices
+	// g.addEdge(0, 3);
+	// g.addEdge(0, 6);
+	// g.addEdge(5, 10);
+	// g.addEdge(6, 7);
+	// g.addEdge(7, 8);
+	// g.addEdge(7, 9);
+	// g.addEdge(8, 10);
+	// g.addEdge(10, 9);
+	// g.addEdge(1, 2);
+	// g.addEdge(1, 9);
+	// g.addEdge(2, 3);
+	// g.addEdge(2, 9);
+	// g.addEdge(3, 4);
+	// g.addEdge(4, 5);
+	// g.addEdge(4, 8);
+	// g.addEdge(5, 6);
+
+
+	// These are 9 edges and 8 vertices
+
+	// Mapping:
+	// x = 0
+	// z = 1
+	// u = 2
+	// w = 3
+	// y = 4
+	// v = 5
+	// s = 6
+	// t = 7	
+
+	g.addEdge(0, 1);
 	g.addEdge(1, 2);
-	g.addEdge(1, 9);
 	g.addEdge(2, 3);
-	g.addEdge(2, 9);
-	g.addEdge(3, 4);
-	g.addEdge(4, 5);
-	g.addEdge(4, 8);
-	g.addEdge(5, 6);*/
+	g.addEdge(2, 4);
+	g.addEdge(1, 5);
+	g.addEdge(0, 6);
+	g.addEdge(6, 7);
+
+	g.addEdge(0, 3);
+	g.addEdge(1, 4);
 	
 	
 	g.DFS();
@@ -487,6 +585,53 @@ int main()
 	clock_t end = clock();
   	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
   	cout << "elapsed_secs: " << elapsed_secs << endl;
+
+
+  	SegmentTreeNode *nodes = segTree.getNodes();
+  	BinarySearchTree *ptrBST =  nodes[1].getBinarySearchTree();
+  	BSTNode* rootNode = ptrBST -> root;
+  	vector<BSTNode*> BSTNodeVector = ptrBST -> inorderforList();
+
+  	cout << "Printing Vector of root SegmentTree" << endl;
+  	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
+  	{
+		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;  		
+  	}
+
+
+  	cout << "DFS Edge List" << endl;
+
+  	g.DFSEdgeList();
+
+  	cout << "Path List" << endl;
+ 	vector<int> pathList = g.Path(0,5);
+  	for (vector<int>::iterator i = pathList.begin(); i != pathList.end(); ++i)
+  	{
+  		cout << *i << endl;
+  	}
+
+  	cout << "Children List" << endl;
+  	std::vector<int> childVector = g.findChildren(2);	//w
+  	for (vector<int>::iterator i = childVector.begin(); i != childVector.end(); ++i)
+  	{
+  		cout << *i << endl;
+  	}
+
+  	int a = INT_MAX, b = INT_MAX;
+  	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
+	{
+		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
+		if(find(pathList.begin(),pathList.end(), (*i)-> m_vertex.first) != pathList.end() && find(childVector.begin(),childVector.end(), (*i) -> m_vertex.second) != childVector.end())
+		{
+			cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
+			if(a > (*i) -> m_vertex.first)
+			{
+				a = (*i) -> m_vertex.first;
+				b = (*i) -> m_vertex.second;		
+			}
+		}
+	}
+	cout << "Edge: " << a << b << endl;
 
 	return 0;
 }
