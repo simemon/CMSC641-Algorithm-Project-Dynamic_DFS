@@ -8,12 +8,22 @@
 #include <climits>
 
 
-/*#define VERTEX 1000
-#define EDGES 2500
+#define EDGES 700
+#define VERTEX 500
+
+#define DEBUG false
+
+
+/*#define VERTEX 11
+#define EDGES 16
 */
 
-#define VERTEX 8
+/*#define VERTEX 8
 #define EDGES 9
+*/
+
+/*int VERTEX;
+int EDGES;*/
 
 using namespace std;
 
@@ -83,7 +93,8 @@ void Graph::DFSUtil(int v, bool visited[])
 	vertexList.push_back(v);
 	visited[v] = true;
 
-	cout << v << " ";
+	if(DEBUG)
+		cout << v << " ";
 	// Recur for all the vertices adjacent to this vertex
 
 	list<int>::iterator i;
@@ -140,7 +151,7 @@ void Graph::edgeList()
 
 std::vector< pair<int,int> > Graph::searchEdge(int x, bool flagBidirectionalEdges = true)
 {
-	cout<<"In search edge: "<< x << endl;
+	/*cout<<"In search edge: "<< x << endl;*/
 	std::vector< pair<int,int> > vEdgeList;
 
 	for (vector< pair <int,int> >::iterator i = bidirectionalEdges.begin(); i != bidirectionalEdges.end(); ++i)
@@ -154,7 +165,8 @@ std::vector< pair<int,int> > Graph::searchEdge(int x, bool flagBidirectionalEdge
 		{
 			if(flagBidirectionalEdges && i->second == x)
 			{
-				cout << i->first << " " << i->second << endl;
+				if(DEBUG)
+					cout << i->first << " " << i->second << endl;
 				vEdgeList.push_back(make_pair(i->first,i->second));
 			}
 		}
@@ -414,16 +426,17 @@ struct SegmentTreeNode
   	ptrBST = new BinarySearchTree();
   	ptrBST -> buildBST(value);
 
-  	cout<<"Inorder of BST at " << value << endl; 
+  	if(DEBUG)
+  		cout<<"Inorder of BST at " << value << endl; 
   	
-  	ptrBST->inorder();
+  	if(DEBUG)
+  		ptrBST->inorder();
     segVertex.push_back(value);
   }
 
   void merge(SegmentTreeNode& left, SegmentTreeNode& right) 
   {
 
-  	/*cout << "In Merge Function: " << endl;*/
   	segVertex.reserve( left.segVertex.size() + right.segVertex.size() );
   	segVertex.insert(segVertex.end(), left.segVertex.begin(), left.segVertex.end());
   	segVertex.insert(segVertex.end(), right.segVertex.begin(), right.segVertex.end());
@@ -438,10 +451,6 @@ struct SegmentTreeNode
   		{
   			ptrBST -> insert(*i);
   		}
-
-  		/*cout << "Before ptrBST -> inorder()" << endl; 
-  		ptrBST -> inorder();
-  		cout << "After ptrBST -> inorder()" << endl; */
   	}
   }
 };
@@ -507,10 +516,9 @@ pair <int, int> Query(vector<BSTNode*> &BSTNodeVector, int w, int x, int y)
 	pair<int, int > final_edge = make_pair(INT_MAX,INT_MAX);
 	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
 	{
-		/*cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;*/
 		if(find(pathList.begin(),pathList.end(), (*i)-> m_vertex.first) != pathList.end() && find(childVector.begin(),childVector.end(), (*i) -> m_vertex.second) != childVector.end())
 		{
-			cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;
+			/*cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;*/
 			if(final_edge.first > (*i) -> m_vertex.first)
 			{
 				final_edge.first = (*i) -> m_vertex.first;
@@ -527,10 +535,17 @@ pair <int, int> Query(vector<BSTNode*> &BSTNodeVector, int w, int x, int y)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
-	/*srand (time(NULL));
+	/*VERTEX = atoi(argv[1]);
+	EDGES = atoi(argv[2]);
+
+	cout << VERTEX << endl;
+	cout << EDGES << endl;*/
+
+
+	srand (time(NULL));
 	set < pair<int,int> > s;
 	int v1, v2;
 
@@ -558,7 +573,7 @@ int main()
 	{
 		pair<int,int> p1 = *i;
 		g.addEdge(p1.first, p1.second);
-	}*/	
+	}	
 
 	// These are 16 edges and 11 vertices
 	// g.addEdge(0, 3);
@@ -591,7 +606,7 @@ int main()
 	// s = 6
 	// t = 7	
 
-	g.addEdge(0, 1);
+	/*g.addEdge(0, 1);
 	g.addEdge(1, 2);
 	g.addEdge(2, 3);
 	g.addEdge(2, 4);
@@ -600,7 +615,7 @@ int main()
 	g.addEdge(6, 7);
 
 	g.addEdge(0, 3);
-	g.addEdge(1, 4);
+	g.addEdge(1, 4);*/
 	
 	
 	g.DFS();
@@ -609,6 +624,7 @@ int main()
 	cout << "Edge List Printing in DFS order" << endl;
 	g.edgeList();
 	
+	cout << "elapsed_secs starts for SegmentTree" << endl;
 	clock_t begin = clock();
 	SegmentTree segTree;
 	clock_t end = clock();
@@ -621,7 +637,7 @@ int main()
   	BSTNode* rootNode = ptrBST -> root;
   	vector<BSTNode*> BSTNodeVector = ptrBST -> inorderforList();
 
-  	cout << "Printing Vector of root SegmentTree" << endl;
+  	/*cout << "Printing Vector of root SegmentTree" << endl;
   	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
   	{
 		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;  		
@@ -640,11 +656,24 @@ int main()
   	for (vector<int>::iterator i = childVector.begin(); i != childVector.end(); ++i)
   	{
   		cout << *i << endl;
-  	}
-
- 	pair<int,int> final_edge = Query(BSTNodeVector,2,0,5);
+  	}*/
   	
-	cout << "Edge: " << final_edge.first  << " " << final_edge.second << endl;
+  	int w = rand() % VERTEX;
+  	int y;
+  	while(1)
+  	{
+  		y = rand() % VERTEX;
+  		if(y != w)
+  			break;
+  	}
+  	cout << "W: " << w << endl;
+  	cout << "Y: " << y << endl;
+
+
+
+ 	pair<int,int> final_edge = Query(BSTNodeVector,w,0,y);
+  	cout << "Edge: " << final_edge.first  << " " << final_edge.second << endl;
+  	cout << "Total edges: " << EDGES << " and Total vertices: " << VERTEX << endl;
 
 	return 0;
 }
