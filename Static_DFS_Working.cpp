@@ -8,28 +8,15 @@
 #include <climits>
 
 
-#define EDGES 700
-#define VERTEX 500
+#define EDGES 16
+#define VERTEX 11
 
 #define DEBUG false
-
-
-/*#define VERTEX 11
-#define EDGES 16
-*/
-
-/*#define VERTEX 8
-#define EDGES 9
-*/
-
-/*int VERTEX;
-int EDGES;*/
 
 using namespace std;
 
 #ifndef G_H
 #define G_H
-
 
 class SegmentTree;
 class BinarySearchTree;
@@ -49,17 +36,29 @@ class Graph
 
 
 public:
+
 	vector< pair<int,int> > DFSEdges;
+
 	Graph() { }
+
 	Graph(int V); // Constructor
+
 	void addEdge(int v, int w); // function to add an edge to graph
+
 	void DFS(); // prints DFS traversal of the complete graph
+
 	void vectorListPrint();	//to print whether vertex is properly stored in the list or not
+
 	void edgeList();
+
 	vector< pair<int,int> > searchEdge(int x, bool bidirection);	//Search all the edges 
+
 	void DFSEdgeList();
+
 	void PathUtil(int a, int b, vector<int> &v);
+
 	vector<int> findChildren(int w);
+
 	vector<int> Path(int a, int b)
 	{
 		vector<int> pathvector;
@@ -70,13 +69,10 @@ public:
 	}
 };
 
-
-
 Graph::Graph(int V)
 {
 	this->V = V;
-	adj = new list<int>[V];
-	/* creating a new vector to store the list of vertex in DFS order	*/
+	adj = new list<int>[V];	/* creating a new vector to store the list of vertex in DFS order	*/
 	vertexListCounter = 0;	// this is to maintain the index of Vertex List Vector
 }
 
@@ -99,15 +95,13 @@ void Graph::DFSUtil(int v, bool visited[])
 
 	list<int>::iterator i;
 	for(i = adj[v].begin(); i != adj[v].end(); ++i)
+	{
 		if(!visited[*i])
 		{
-			/*bidirectionalEdges.push_back(make_pair(v,*i));
-			bidirectionalEdges.push_back(make_pair(*i,v));*/
-			
 			DFSEdges.push_back(make_pair(v,*i));
-
 			DFSUtil(*i, visited);
 		}
+	}
 }
 
 // The function to do DFS traversal. It uses recursive DFSUtil()
@@ -534,17 +528,9 @@ pair <int, int> Query(vector<BSTNode*> &BSTNodeVector, int w, int x, int y)
 	return final_edge;
 }
 
-
-int main(int argc, char* argv[])
+void RandomGraph()
 {
-
-	/*VERTEX = atoi(argv[1]);
-	EDGES = atoi(argv[2]);
-
-	cout << VERTEX << endl;
-	cout << EDGES << endl;*/
-
-
+	/* To create a random graph */
 	srand (time(NULL));
 	set < pair<int,int> > s;
 	int v1, v2;
@@ -573,26 +559,13 @@ int main(int argc, char* argv[])
 	{
 		pair<int,int> p1 = *i;
 		g.addEdge(p1.first, p1.second);
-	}	
+	}
+}
 
-	// These are 16 edges and 11 vertices
-	// g.addEdge(0, 3);
-	// g.addEdge(0, 6);
-	// g.addEdge(5, 10);
-	// g.addEdge(6, 7);
-	// g.addEdge(7, 8);
-	// g.addEdge(7, 9);
-	// g.addEdge(8, 10);
-	// g.addEdge(10, 9);
-	// g.addEdge(1, 2);
-	// g.addEdge(1, 9);
-	// g.addEdge(2, 3);
-	// g.addEdge(2, 9);
-	// g.addEdge(3, 4);
-	// g.addEdge(4, 5);
-	// g.addEdge(4, 8);
-	// g.addEdge(5, 6);
+int main(int argc, char* argv[])
+{
 
+	RandomGraph();		
 
 	// These are 9 edges and 8 vertices
 
@@ -613,10 +586,8 @@ int main(int argc, char* argv[])
 	g.addEdge(1, 5);
 	g.addEdge(0, 6);
 	g.addEdge(6, 7);
-
 	g.addEdge(0, 3);
 	g.addEdge(1, 4);*/
-	
 	
 	g.DFS();
 	cout << "List Printing in DFS order" << endl;
@@ -637,28 +608,7 @@ int main(int argc, char* argv[])
   	BSTNode* rootNode = ptrBST -> root;
   	vector<BSTNode*> BSTNodeVector = ptrBST -> inorderforList();
 
-  	/*cout << "Printing Vector of root SegmentTree" << endl;
-  	for (std::vector<BSTNode*>::iterator i = BSTNodeVector.begin(); i != BSTNodeVector.end(); ++i)
-  	{
-		cout << (*i) -> m_vertex.first << " " << (*i) -> m_vertex.second << endl;  		
-  	}
-
-  	cout << "DFS Edge List" << endl;
- 	g.DFSEdgeList();
- 	cout << "Path List" << endl;
- 	vector<int> pathList = g.Path(0,5);
-  	for (vector<int>::iterator i = pathList.begin(); i != pathList.end(); ++i)
-  	{
-  		cout << *i << endl;
-  	}
-  	cout << "Children List" << endl;
-  	std::vector<int> childVector = g.findChildren(2);	//w
-  	for (vector<int>::iterator i = childVector.begin(); i != childVector.end(); ++i)
-  	{
-  		cout << *i << endl;
-  	}*/
-  	
-  	int w = rand() % VERTEX;
+   	int w = rand() % VERTEX;
   	int y;
   	while(1)
   	{
@@ -666,12 +616,8 @@ int main(int argc, char* argv[])
   		if(y != w)
   			break;
   	}
-  	cout << "W: " << w << endl;
-  	cout << "Y: " << y << endl;
-
-
-
- 	pair<int,int> final_edge = Query(BSTNodeVector,w,0,y);
+ 
+  	pair<int,int> final_edge = Query(BSTNodeVector,w,0,y);
   	cout << "Edge: " << final_edge.first  << " " << final_edge.second << endl;
   	cout << "Total edges: " << EDGES << " and Total vertices: " << VERTEX << endl;
 
